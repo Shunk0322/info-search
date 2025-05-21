@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ファクトチェック用情報検索ツール</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f7fa;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h2 {
+      color: #2c3e50;
+    }
+
+    .input-large {
+      font-size: 20px;
+      padding: 16px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .filters label {
+      display: flex;
+      flex-direction: column;
+      font-size: 13px;
+    }
+
+    input[type="date"], select {
+      font-size: 13px;
+      padding: 4px 6px;
+      box-sizing: border-box;
+    }
+
+    .section {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 4px 12px;
+    }
+
+    label {
+      display: block;
+      margin: 5px 0;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .select-all {
+      font-weight: bold;
+      margin-bottom: 8px;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h2>ファクトチェック用情報検索ツール</h2>
+
+  <label>🔍 キーワード（複数可）：</label>
+  <input id="keyword" class="input-large" placeholder="例：ワクチン 安全性">
+
+  <div class="filters">
+    <label>
+      検索モード：
+      <select id="searchMode">
+        <option value="AND">AND（すべて含む）</option>
+        <option value="OR">OR（いずれかを含む）</option>
+      </select>
+    </label>
+
+    <label>
+      📅 開始日：
+      <input type="date" id="startDate">
+    </label>
+
+    <label>
+      📅 終了日：
+      <input type="date" id="endDate">
+    </label>
+  </div>
+
+  <div class="section">
+    <strong>政府・公的機関：</strong>
+    <div class="checkbox-grid">
+      <label><input type="checkbox" value="site:go.jp" checked> 政府全体（*.go.jp）</label>
+      <label><input type="checkbox" value="site:kantei.go.jp"> 首相官邸</label>
+    </div>
+  </div>
+
+  <div class="section">
+    <strong>報道機関：</strong>
+    <label class="select-all"><input type="checkbox" onclick="toggleAll('media', this)"> すべて選択</label>
+    <div class="checkbox-grid">
+      <label><input type="checkbox" value="site:kyodonews.jp" class="media"> 共同通信</label>
+      <label><input type="checkbox" value="site:jiji.com" class="media"> 時事通信</label>
+      <label><input type="checkbox" value="site:asahi.com" class="media"> 朝日新聞</label>
+      <label><input type="checkbox" value="site:yomiuri.co.jp" class="media"> 読売新聞</label>
+      <label><input type="checkbox" value="site:mainichi.jp" class="media"> 毎日新聞</label>
+      <label><input type="checkbox" value="site:nikkei.com" class="media"> 日経新聞</label>
+      <label><input type="checkbox" value="site:tokyo-np.co.jp" class="media"> 東京新聞</label>
+    </div>
+  </div>
+
+  <div class="section">
+    <strong>海外報道機関：</strong>
+    <label class="select-all"><input type="checkbox" onclick="toggleAll('intl', this)"> すべて選択</label>
+    <div class="checkbox-grid">
+      <label><input type="checkbox" value="site:bbc.com" class="intl"> BBC</label>
+      <label><input type="checkbox" value="site:cnn.com" class="intl"> CNN</label>
+      <label><input type="checkbox" value="site:nytimes.com" class="intl"> New York Times</label>
+      <label><input type="checkbox" value="site:washingtonpost.com" class="intl"> Washington Post</label>
+      <label><input type="checkbox" value="site:reuters.com" class="intl"> Reuters</label>
+      <label><input type="checkbox" value="site:bloomberg.com" class="intl"> Bloomberg</label>
+      <label><input type="checkbox" value="site:theguardian.com" class="intl"> The Guardian</label>
+    </div>
+  </div>
+
+  <div class="section">
+    <strong>テレビ局：</strong>
+    <label class="select-all"><input type="checkbox" onclick="toggleAll('tv', this)"> すべて選択</label>
+    <div class="checkbox-grid">
+      <label><input type="checkbox" value="site:nhk.or.jp" class="tv" checked> NHK</label>
+      <label><input type="checkbox" value="site:ntv.co.jp" class="tv"> 日テレ</label>
+      <label><input type="checkbox" value="site:tbs.co.jp" class="tv"> TBS</label>
+      <label><input type="checkbox" value="site:fujitv.co.jp" class="tv"> フジテレビ</label>
+      <label><input type="checkbox" value="site:tv-asahi.co.jp" class="tv"> テレビ朝日</label>
+      <label><input type="checkbox" value="site:tv-tokyo.co.jp" class="tv"> テレビ東京</label>
+    </div>
+  </div>
+
+  <div class="section">
+    <label><input type="checkbox" value="factcheck" checked> Googleファクトチェックエクスプローラー</label>
+    <label><input type="checkbox" value="scholar"> 論文（Google Scholar / PubMed）</label>
+  </div>
+
+  <button onclick="search()">🔍 検索する</button>
+
+  <script>
+    function toggleAll(className, masterCheckbox) {
+      const checkboxes = document.querySelectorAll('input.' + className);
+      checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+    }
+
+    function search() {
+      const keywordInput = document.getElementById('keyword').value.trim();
+      const searchMode = document.getElementById('searchMode').value;
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+
+      if (!keywordInput) {
+        alert("キーワードを入力してください。");
+        return;
+      }
+
+      const keywords = keywordInput.split(/\s+/);
+      const keywordQuery = keywords.join(searchMode === "AND" ? " " : " OR ");
+
+      const checks = document.querySelectorAll('input[type=checkbox]:checked');
+      let querySites = [];
+      let useFactCheckExplorer = false;
+      let useScholar = false;
+
+      checks.forEach(cb => {
+        if (cb.value === "factcheck") {
+          useFactCheckExplorer = true;
+        } else if (cb.value === "scholar") {
+          useScholar = true;
+        } else {
+          querySites.push(cb.value);
+        }
+      });
+
+      if (useFactCheckExplorer) {
+        const fcUrl = `https://toolbox.google.com/factcheck/explorer/search/${encodeURIComponent(keywordQuery)}`;
+        window.open(fcUrl, '_blank');
+      }
+
+      if (useScholar) {
+        const scholarUrl = `https://scholar.google.com/scholar?q=${encodeURIComponent(keywordQuery)}`;
+        const pubmedUrl = `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(keywordQuery)}`;
+        window.open(scholarUrl, '_blank');
+        window.open(pubmedUrl, '_blank');
+      }
+
+      if (querySites.length > 0) {
+        let query = `${keywordQuery} (${querySites.join(" OR ")})`;
+        if (startDate) query += ` after:${startDate}`;
+        if (endDate) query += ` before:${endDate}`;
+        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        window.open(googleUrl, '_blank');
+      }
+    }
+  </script>
+</body>
+</html>
